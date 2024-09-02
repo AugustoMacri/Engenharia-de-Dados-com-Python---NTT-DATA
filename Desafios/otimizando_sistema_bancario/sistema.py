@@ -2,11 +2,22 @@
 # - Estabelecendo um limite de 10 trnsações diárias para uma conta
 # - Se o usuário tentar realizar uma transação após atingir o limite, deve ser informado que ele excedeu o número de transações permitidas no dia
 # - Mostre a data e hora das transações no extrato
+# - Tornar possível cadastrar um usuario
+# - Vincular esse cliente a uma conta
 
 import datetime as dt
+from cliente import Cliente
 
 # Lista para armazenar transacoes
 transacoes = []
+
+# Lista para armazenar os clientes
+lista_clientes = []
+
+# Dicionario para clientes com conta
+lista_clientes_conta = {}
+
+numero_conta = 0000
 
 
 def deposito(valor, saldo, num_transacao_hoje, transacoes_diarias):
@@ -62,6 +73,42 @@ def extrato_bancario(extrato, saldo):
     print("---------------------------")
 
 
+def cadastrarUsuario():
+    print("Digite as seguintes credenciais:")
+    nome = input("nome: ")
+    sexo = input("sexo: ")
+    cpf = input("cpf: ")
+    endereco = input("Endereco: ")
+
+    # Criando o objeto cliente
+    cliente = Cliente(nome, sexo, cpf, endereco)
+
+    lista_clientes.append(cliente)
+
+    return cliente
+
+
+def criarContaCorrente():
+    global numero_conta
+
+    print("Deseja criar uma conta para qual cpf?")
+    cpf = input()
+
+    for cliente in lista_clientes:
+        if cliente.cpf == cpf:
+            print("Cliente encontrado")
+            dict1 = {cliente.cpf: numero_conta}
+
+            lista_clientes_conta.update(dict1)
+
+            numero_conta += 1
+
+            return 1
+
+    print("Cliente nao encontrado")
+    return 0
+
+
 saldo = 0
 num_saques = 0
 transacoes_diarias = 10
@@ -70,7 +117,6 @@ extrato = []
 # Extraindo o dia de hoje
 data = dt.datetime.now()
 data_hoje = data.day
-
 
 while True:
 
@@ -81,31 +127,39 @@ while True:
     print("|        Bem-Vindo        |")
     print("---------------------------")
     print("|    Escolha uma opção    |")
-    print("|1 - Realizar depósito    |")
-    print("|2 - Realizar Saque       |")
-    print("|3 - Visualizar extrato   |")
-    print("|4 - Sair                 |")
+    print("|1 - Cadastrar Cliente    |")
+    print("|2 - Criar Conta          |")
+    print("|3 - Realizar depósito    |")
+    print("|4 - Realizar Saque       |")
+    print("|5 - Visualizar extrato   |")
+    print("|6 - Sair                 |")
     print("---------------------------")
 
     opcao = int(input())
 
     if opcao == 1:
+        cadastrarUsuario()
+
+    elif opcao == 2:
+        criarContaCorrente()
+
+    elif opcao == 3:
         valor_deposito = int(
             input("Digite o valor que gostaria de depositar:"))
 
         saldo = (deposito(valor_deposito, saldo,
                  num_transacao_hoje, transacoes_diarias))
 
-    elif opcao == 2:
+    elif opcao == 4:
         valor_saque = int(input("Digite o valor que gostaria de sacar:"))
 
         saldo, num_saques = (
             saque(valor_saque, num_saques, saldo, num_transacao_hoje, transacoes_diarias))
 
-    elif opcao == 3:
+    elif opcao == 5:
         extrato_bancario(extrato, saldo)
 
-    elif opcao == 4:
+    elif opcao == 6:
         print("Até a próxima")
 
         break
